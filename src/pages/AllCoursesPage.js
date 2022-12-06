@@ -18,8 +18,7 @@ function AllCoursesPage(props){
                         }
                     }
                 }
-            `,
-            variables: {}
+            `
         }
 
         fetch('http://localhost:8000/graphql', {
@@ -34,12 +33,9 @@ function AllCoursesPage(props){
             return res.json();
         })
         .then(resData =>{
-            // console.log(resData.data.courses.courses)
+            console.log(resData)
             const courses = resData.data.courses.courses
             setLoadedCourses(courses)
-            for (let course of courses){
-                console.log(course)
-            }
         })
     }, [])
 

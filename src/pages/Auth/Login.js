@@ -1,107 +1,91 @@
-import React, { Component } from 'react';
-import Input from '../../components/Input/Input';
-import Button from '../../components/Button/Button';
-import { required, length, email } from '../../util/validators'
-import Auth from './Auth';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import PropTypes from 'prop-types'
 
-class Login extends Component {
-  state = {
-    loginForm: {
-      email: {
-        value: '',
-        valid: false,
-        touched: false,
-        validators: [required, email]
-      },
-      password: {
-        value: '',
-        valid: false,
-        touched: false,
-        validators: [required, length({ min: 5 })]
-      },
-      formIsValid: false
-    }
-  };
-
-  inputChangeHandler = (input, value) => {
-    this.setState(prevState => {
-      let isValid = true;
-      for (const validator of prevState.loginForm[input].validators) {
-        isValid = isValid && validator(value);
-      }
-      const updatedForm = {
-        ...prevState.loginForm,
-        [input]: {
-          ...prevState.loginForm[input],
-          valid: isValid,
-          value: value
+async function loginUser(loginData){
+    console.log(loginData.email)
+    console.log(loginData.password)
+    const graphqlQuery = {
+        query: `
+          query userLogin($email: String!, $password: String!){
+            login(email: $email, password: $password) {
+                token
+                userId
+            }
+          }
+        `,
+        variables:{
+          email: loginData.email,
+          password: loginData.password
         }
       };
-      let formIsValid = true;
-      for (const inputName in updatedForm) {
-        formIsValid = formIsValid && updatedForm[inputName].valid;
-      }
-      return {
-        loginForm: updatedForm,
-        formIsValid: formIsValid
-      };
-    });
-  };
 
-  inputBlurHandler = input => {
-    this.setState(prevState => {
-      return {
-        loginForm: {
-          ...prevState.loginForm,
-          [input]: {
-            ...prevState.loginForm[input],
-            touched: true
-          }
+    return fetch('http://localhost:8000/graphql', {
+        method: 'POST',
+        headers: {
+            // Authorization: 'Bearer ', // need to add token
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(graphqlQuery)
+    })
+    .then(res =>{
+        return res.json()
+    })
+    .then(resData =>{
+        console.log("resData Login.js",resData)
+        if (resData.errors) {
+            throw new Error('User login failed!');
         }
-      };
-    });
-  };
-
-  render() {
-    return (
-      <Auth>
-        <form
-          onSubmit={e =>
-            this.props.onLogin(e, {
-              email: this.state.loginForm.email.value,
-              password: this.state.loginForm.password.value
-            })
-          }
-        >
-          <Input
-            id="email"
-            label="Your E-Mail"
-            type="email"
-            control="input"
-            onChange={this.inputChangeHandler}
-            onBlur={this.inputBlurHandler.bind(this, 'email')}
-            value={this.state.loginForm['email'].value}
-            valid={this.state.loginForm['email'].valid}
-            touched={this.state.loginForm['email'].touched}
-          />
-          <Input
-            id="password"
-            label="Password"
-            type="password"
-            control="input"
-            onChange={this.inputChangeHandler}
-            onBlur={this.inputBlurHandler.bind(this, 'password')}
-            value={this.state.loginForm['password'].value}
-            valid={this.state.loginForm['password'].valid}
-            touched={this.state.loginForm['password'].touched}
-          />
-          <Button design="raised" type="submit" loading={this.props.loading}>
-            Login
-          </Button>
-        </form>
-      </Auth>
-    );
-  }
+        console.log("Login Success")
+        console.log("Setting localStorage")
+        localStorage.setItem('token', resData.data.login.token);
+        localStorage.setItem('userId', resData.data.login.userId);
+        
+        return resData.data.login.token
+    })
+    // .then(()=>{
+    //     const nav = useNavigate()
+    //     nav('/')
+    // })
+    .catch(err =>{
+        console.log(err)
+        // setIsAuth(false)
+    })
 }
 
-export default Login;
+export default function Login({setToken}, props){
+    const [email, setEmail] = useState()
+    const [password, setPassword] = useState()
+    // const [isAuth, setIsAuth] = useState(false)
+    // const [token, setToken] = useState(null)
+    
+    const handleSubmit = async event =>{
+        event.preventDefault()
+        console.log(email)
+        console.log(password)
+        const token = await loginUser({email, password})
+        console.log("setToken", token)
+        setToken(token)
+    }
+
+    return(
+        <div className="login-wrapper">
+            <h1>Login</h1>
+            <form onSubmit={handleSubmit}>
+                <label>
+                    <p>Email</p>
+                    <input type="text" onChange={e => setEmail(e.target.value)}/>
+                </label>
+                <label>
+                    <p>Password</p>
+                    <input type="text" onChange={e => setPassword(e.target.value)}/>
+                </label>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    )
+}
+
+Login.propTypes ={
+    setToken: PropTypes.func.isRequired
+}

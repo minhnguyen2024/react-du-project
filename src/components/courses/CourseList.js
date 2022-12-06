@@ -10,11 +10,6 @@ function CourseList(props){
                     courseID={course.courseID}
                     courseInstructor={course.courseInstructor}
                     courseContent={course.courseContent}
-                    // id={meetup.id} 
-                    // image={meetup.image}
-                    // title={meetup.title}
-                    // address={meetup.address}
-                    // desription={meetup.desription}
                 />
             })}
         </ul>

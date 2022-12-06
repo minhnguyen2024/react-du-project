@@ -1,118 +1,76 @@
-import React, { Component } from 'react';
 
-import Input from '../../components/Form/Input/Input';
-import Button from '../../components/Button/Button';
-import { required, length, email } from '../../util/validators';
-import Auth from './Auth';
+import { useState } from 'react'
 
-class Signup extends Component {
-  state = {
-    signupForm: {
-      email: {
-        value: '',
-        valid: false,
-        touched: false,
-        validators: [required, email]
-      },
-      password: {
-        value: '',
-        valid: false,
-        touched: false,
-        validators: [required, length({ min: 5 })]
-      },
-      name: {
-        value: '',
-        valid: false,
-        touched: false,
-        validators: [required]
-      },
-      formIsValid: false
+export default function Login(props){
+
+    const [email, setEmail] = useState()
+    const [name, setName] = useState()
+    const [password, setPassword] = useState()
+
+    const handleSubmit = event =>{
+        event.preventDefault()
+        signUpUser({email, name, password})
+    }
+
+    return(
+        <div className="login-wrapper">
+            <h1>Sign Up</h1>
+            <form onSubmit={handleSubmit}>
+                <label>
+                    <p>Email</p>
+                    <input type="text" onChange={e => setEmail(e.target.value)}/>
+                </label>
+                <label>
+                    <p>Name</p>
+                    <input type="text" onChange={e => setName(e.target.value)}/>
+                </label>
+                <label>
+                    <p>Password</p>
+                    <input type="text" onChange={e => setPassword(e.target.value)}/>
+                </label>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    )
+}
+
+async function signUpUser(signUpData){
+  console.log(signUpData)
+  const graphqlQuery = {
+    query: `
+      mutation createNewUser($email: String!, $name: String!, $password: String!) {
+        createUser(userInput: {email: $email, name: $name, password: $password}) {
+          _id
+          email
+          name
+          password
+        }
+      }
+    `,
+    variables:{
+      email: signUpData.email,
+      name: signUpData.name,
+      password: signUpData.password
     }
   };
 
-  inputChangeHandler = (input, value) => {
-    this.setState(prevState => {
-      let isValid = true;
-      for (const validator of prevState.signupForm[input].validators) {
-        isValid = isValid && validator(value);
-      }
-      const updatedForm = {
-        ...prevState.signupForm,
-        [input]: {
-          ...prevState.signupForm[input],
-          valid: isValid,
-          value: value
+    fetch('http://localhost:8000/graphql', {
+        method: 'POST',
+        headers: {
+            // Authorization: 'Bearer ' + this.props.token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(graphqlQuery)
+    })
+    .then(res =>{
+        return res.json()
+    })
+    .then(resData =>{
+        if (resData.errors) {
+            throw new Error('User Sign Up failed!');
         }
-      };
-      let formIsValid = true;
-      for (const inputName in updatedForm) {
-        formIsValid = formIsValid && updatedForm[inputName].valid;
-      }
-      return {
-        signupForm: updatedForm,
-        formIsValid: formIsValid
-      };
-    });
-  };
-
-  inputBlurHandler = input => {
-    this.setState(prevState => {
-      return {
-        signupForm: {
-          ...prevState.signupForm,
-          [input]: {
-            ...prevState.signupForm[input],
-            touched: true
-          }
-        }
-      };
-    });
-  };
-
-  render() {
-    return (
-      <Auth>
-        <form onSubmit={e => this.props.onSignup(e, this.state)}>
-          <Input
-            id="email"
-            label="Your E-Mail"
-            type="email"
-            control="input"
-            onChange={this.inputChangeHandler}
-            onBlur={this.inputBlurHandler.bind(this, 'email')}
-            value={this.state.signupForm['email'].value}
-            valid={this.state.signupForm['email'].valid}
-            touched={this.state.signupForm['email'].touched}
-          />
-          <Input
-            id="name"
-            label="Your Name"
-            type="text"
-            control="input"
-            onChange={this.inputChangeHandler}
-            onBlur={this.inputBlurHandler.bind(this, 'name')}
-            value={this.state.signupForm['name'].value}
-            valid={this.state.signupForm['name'].valid}
-            touched={this.state.signupForm['name'].touched}
-          />
-          <Input
-            id="password"
-            label="Password"
-            type="password"
-            control="input"
-            onChange={this.inputChangeHandler}
-            onBlur={this.inputBlurHandler.bind(this, 'password')}
-            value={this.state.signupForm['password'].value}
-            valid={this.state.signupForm['password'].valid}
-            touched={this.state.signupForm['password'].touched}
-          />
-          <Button design="raised" type="submit" loading={this.props.loading}>
-            Signup
-          </Button>
-        </form>
-      </Auth>
-    );
-  }
+    })
+    .catch(err =>{
+        console.log(err)
+    })
 }
-
-export default Signup;

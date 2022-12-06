@@ -17,7 +17,7 @@ const input = props => (
         value={props.value}
         placeholder={props.placeholder}
         onChange={e => props.onChange(props.id, e.target.value, e.target.files)}
-        onBlur={props.onBlur}
+        // onBlur={props.onBlur}
       />
     )}
     {props.control === 'textarea' && (
@@ -31,7 +31,7 @@ const input = props => (
         required={props.required}
         value={props.value}
         onChange={e => props.onChange(props.id, e.target.value)}
-        onBlur={props.onBlur}
+        // onBlur={props.onBlur}
       />
     )}
   </div>

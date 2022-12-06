@@ -3,23 +3,6 @@ import Card from '../ui/Card'
 
 
 function CourseItem(props){
-    // const favoriteContext = useContext(FavoritesContext)
-    // const itemIsFavorite = favoriteContext.itemIsFavorite(props.id)
-
-    // function toggleFavoriteStatusHandler(){
-    //     if(itemIsFavorite){
-    //         favoriteContext.removeFavorite(props.id)
-    //     } else{
-    //         favoriteContext.addFavorite({
-    //             id: props.id,
-    //             title: props.title,
-    //             description: props.description,
-    //             image: props.image,
-    //             address: props.address
-    //         })
-    //     }
-    // }
-
     return (
         <ul>
             <li className={classes.item}>
