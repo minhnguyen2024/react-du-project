@@ -5,8 +5,7 @@ function CreateNewCourse(){
     function createNewCourseHandler(courseData){
         console.log(courseData)
         const token = localStorage.getItem('token')
-        console.log("local token createNewCourse", token)
-        
+    
         let graphqlQuery = {
             query: `
             mutation CreateNewCourse($courseID: String!, $courseTitle: String!, $courseInstructor: String!, $courseContent: String!){

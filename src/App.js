@@ -13,7 +13,6 @@ function App() {
   
   // console.log("App token", token)
   // if(!token){
-  //   console.log("no token found")
   //   return <LoginPage setToken={setToken}/>
   // }
  

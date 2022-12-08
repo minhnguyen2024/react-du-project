@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import classes from '../Page.module.css'
 
 async function loginUser(loginData){
+    
     console.log(loginData.email)
     console.log(loginData.password)
     const graphqlQuery = {
@@ -39,25 +41,19 @@ async function loginUser(loginData){
         console.log("Login Success")
         console.log("Setting localStorage")
         localStorage.setItem('token', resData.data.login.token);
+        console.log(resData.data.login.token)
         localStorage.setItem('userId', resData.data.login.userId);
-        
         return resData.data.login.token
     })
-    // .then(()=>{
-    //     const nav = useNavigate()
-    //     nav('/')
-    // })
     .catch(err =>{
         console.log(err)
-        // setIsAuth(false)
     })
 }
 
 export default function Login({setToken}, props){
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
-    // const [isAuth, setIsAuth] = useState(false)
-    // const [token, setToken] = useState(null)
+    const nav = useNavigate()
     
     const handleSubmit = async event =>{
         event.preventDefault()
@@ -66,21 +62,32 @@ export default function Login({setToken}, props){
         const token = await loginUser({email, password})
         console.log("setToken", token)
         setToken(token)
+        nav('/my-courses')
+
     }
 
     return(
         <div className="login-wrapper">
             <h1>Login</h1>
+            <div className={classes.control}>
+
+            </div>
             <form onSubmit={handleSubmit}>
-                <label>
-                    <p>Email</p>
-                    <input type="text" onChange={e => setEmail(e.target.value)}/>
-                </label>
-                <label>
-                    <p>Password</p>
-                    <input type="text" onChange={e => setPassword(e.target.value)}/>
-                </label>
-                <button type="submit">Submit</button>
+                <div className={classes.control}>
+                    <label>
+                        <p>Email</p>
+                        <input type="text" onChange={e => setEmail(e.target.value)}/>
+                    </label>
+                </div>
+                <div className={classes.control}>
+                    <label>
+                        <p>Password</p>
+                        <input type="text" onChange={e => setPassword(e.target.value)}/>
+                    </label>
+                </div>
+                <div className={classes.actions}>
+                    <button type="submit">Log In</button>
+                </div>
             </form>
         </div>
     )

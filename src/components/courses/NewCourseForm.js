@@ -1,20 +1,24 @@
 import { useRef } from 'react'
-
+import { useActionData, useNavigate } from 'react-router-dom'
 import Card from "../ui/Card"
 import classes from './NewCourseForm.module.css'
-function NewCourseForm(props){
+export default function NewCourseForm(props){
     const courseIDInputRef = useRef()
     const courseTitleInputRef = useRef()
-    const courseIntructorInputRef = useRef()
+    const courseInstructorInputRef = useRef()
     const courseContentInputRef = useRef()
+    const nav = useNavigate()
 
-
-    function submitHandler(event){
+    const submitHandler = (event) =>{
         event.preventDefault()
         const courseID = courseIDInputRef.current.value
         const courseTitle = courseTitleInputRef.current.value
-        const courseInstructor = courseContentInputRef.current.value
+        const courseInstructor = courseInstructorInputRef.current.value
         const courseContent = courseContentInputRef.current.value
+        // console.log(courseID)
+        // console.log(courseTitle)
+        // console.log(courseInstructor)
+        // console.log(courseContent)
 
         const courseData = {
             courseID: courseID,
@@ -23,7 +27,9 @@ function NewCourseForm(props){
             courseContent: courseContent
             // createdBy: "Dummy User"
         }
+        console.log(courseData)
         props.onCreateNewCourse(courseData)
+        nav('/my-courses')
     }
 
     return (
@@ -39,7 +45,7 @@ function NewCourseForm(props){
             </div>
             <div className={classes.control}>
                 <label htmlFor='courseInstructor'>Course Instructor</label>
-                <input type="text" required id="courseInstructor" ref={courseIntructorInputRef}/>
+                <input type="text" required id="courseInstructor" ref={courseInstructorInputRef}/>
             </div>
             <div className={classes.control}>
                 <label htmlFor='courseContent'>Course Description</label>
@@ -52,5 +58,3 @@ function NewCourseForm(props){
         </Card>
     )
 }
-
-export default NewCourseForm

@@ -1,8 +1,9 @@
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function Login(props){
-
+    const nav = useNavigate()
     const [email, setEmail] = useState()
     const [name, setName] = useState()
     const [password, setPassword] = useState()
@@ -10,6 +11,7 @@ export default function Login(props){
     const handleSubmit = event =>{
         event.preventDefault()
         signUpUser({email, name, password})
+        nav('/login')
     }
 
     return(
